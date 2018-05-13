@@ -1,1 +1,1 @@
-gcc get_next_line.c main.c libft/libft.a -o fjk
+gcc get_next_line.c main.c libft/libft.a -o gnl

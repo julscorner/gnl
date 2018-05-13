@@ -12,12 +12,17 @@
 
 #include "get_next_line.h"
 #include <stdio.h>
-static char	*increase_buf(int const fd, char *oldbuf, int *ret_val)
+static char	*increase_buf(int const fd, char *oldbuf, int *ret_val, int *err)
 {
 	char	tmp[BUFF_SIZE + 1];
 	char	*newbuf;
 
 	*ret_val = read(fd, tmp, BUFF_SIZE);
+	if (*ret_val == -1)
+	{
+	*err = 1;
+	*ret_val = 0;
+	}
 	tmp[*ret_val] = '\0';
 	newbuf = ft_strjoin(oldbuf, tmp);
 	ft_strdel(&oldbuf);
@@ -29,10 +34,11 @@ int			get_next_line(int const fd, char **line)
 	static char		*buf = "";
 	int				ret;
 	char			*str;
-
+	int 			err;
 	if (!line || fd < 0)
 		return (-1);
 	ret = 1;
+	err = 0;
 	if (!*buf)
 		buf = ft_strnew(0);
 	while (ret > 0)
@@ -42,13 +48,17 @@ int			get_next_line(int const fd, char **line)
 			*str = '\0';
 			*line = ft_strdup(buf);
 			ft_memmove(buf, str + 1, ft_strlen(str + 1) + 1);
-			//ft_putnbr(ret);
-		//	printf("ret == %d return 1\n", ret);
 			return (1);
 		}
-		buf = increase_buf(fd, buf, &ret);
+		buf = increase_buf(fd, buf, &ret, &err);
+		if (err == 1)
+			return (-1);
 	}
-//	printf("ret == %d\n", ret);
-	//ft_putnbr(ret);
+	if (*buf)
+	{
+		*line = ft_strdup(buf);
+		*buf = '\0';
+		return (1);
+	}
 	return (ret);
 }
