@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jmurte <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: jmurte <jmurte@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/10 16:31:52 by jmurte            #+#    #+#             */
-/*   Updated: 2018/05/11 14:44:30 by jmurte           ###   ########.fr       */
+/*   Updated: 2018/05/23 19:26:32 by jmurte           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <stdio.h>
-static char	*increase_buf(int const fd, char *oldbuf, int *ret_val, int *err)
+
+static char		*increase_buf(int fd, char *oldbuf, int *ret_val, int *err)
 {
 	char	tmp[BUFF_SIZE + 1];
 	char	*newbuf;
@@ -20,8 +20,8 @@ static char	*increase_buf(int const fd, char *oldbuf, int *ret_val, int *err)
 	*ret_val = read(fd, tmp, BUFF_SIZE);
 	if (*ret_val == -1)
 	{
-	*err = 1;
-	*ret_val = 0;
+		*err = 1;
+		*ret_val = 0;
 	}
 	tmp[*ret_val] = '\0';
 	newbuf = ft_strjoin(oldbuf, tmp);
@@ -29,25 +29,39 @@ static char	*increase_buf(int const fd, char *oldbuf, int *ret_val, int *err)
 	return (newbuf);
 }
 
-int			get_next_line(int const fd, char **line)
+static char		*line_with_newline(char *str, char **line, char *buf)
+{
+	*str = '\0';
+	*line = ft_strdup(buf);
+	ft_memmove(buf, str + 1, ft_strlen(str + 1) + 1);
+	return (*line);
+}
+
+static int		line_without_linefeed(char **line, char *buf)
+{
+	*line = ft_strdup(buf);
+	*buf = '\0';
+	return (1);
+}
+
+static int		get_next_line(int const fd, char **line)
 {
 	static char		*buf = "";
 	int				ret;
 	char			*str;
-	int 			err;
-	if (!line || fd < 0)
-		return (-1);
+	int				err;
+
 	ret = 1;
 	err = 0;
+	if (!line || fd < 0)
+		return (-1);
 	if (!*buf)
 		buf = ft_strnew(0);
 	while (ret > 0)
 	{
 		if ((str = ft_strchr(buf, '\n')))
 		{
-			*str = '\0';
-			*line = ft_strdup(buf);
-			ft_memmove(buf, str + 1, ft_strlen(str + 1) + 1);
+			*line = line_with_newline(str, line, buf);
 			return (1);
 		}
 		buf = increase_buf(fd, buf, &ret, &err);
@@ -55,10 +69,6 @@ int			get_next_line(int const fd, char **line)
 			return (-1);
 	}
 	if (*buf)
-	{
-		*line = ft_strdup(buf);
-		*buf = '\0';
-		return (1);
-	}
+		ret = line_without_linefeed(line, buf);
 	return (ret);
 }
