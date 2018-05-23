@@ -6,13 +6,13 @@
 /*   By: jmurte <jmurte@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/10 16:31:52 by jmurte            #+#    #+#             */
-/*   Updated: 2018/05/23 19:26:32 by jmurte           ###   ########.fr       */
+/*   Updated: 2018/05/23 19:39:35 by jmurte           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static char		*increase_buf(int fd, char *oldbuf, int *ret_val, int *err)
+char			*increase_buf(int fd, char *oldbuf, int *ret_val, int *err)
 {
 	char	tmp[BUFF_SIZE + 1];
 	char	*newbuf;
@@ -29,7 +29,7 @@ static char		*increase_buf(int fd, char *oldbuf, int *ret_val, int *err)
 	return (newbuf);
 }
 
-static char		*line_with_newline(char *str, char **line, char *buf)
+char			*line_with_newline(char *str, char **line, char *buf)
 {
 	*str = '\0';
 	*line = ft_strdup(buf);
@@ -37,14 +37,14 @@ static char		*line_with_newline(char *str, char **line, char *buf)
 	return (*line);
 }
 
-static int		line_without_linefeed(char **line, char *buf)
+int				line_without_linefeed(char **line, char *buf)
 {
 	*line = ft_strdup(buf);
 	*buf = '\0';
 	return (1);
 }
 
-static int		get_next_line(int const fd, char **line)
+int				get_next_line(int const fd, char **line)
 {
 	static char		*buf = "";
 	int				ret;
