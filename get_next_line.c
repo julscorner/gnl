@@ -6,7 +6,7 @@
 /*   By: jmurte <jmurte@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/10 16:31:52 by jmurte            #+#    #+#             */
-/*   Updated: 2018/05/23 19:39:35 by jmurte           ###   ########.fr       */
+/*   Updated: 2018/05/24 15:56:13 by jmurte           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,16 +46,23 @@ int				line_without_linefeed(char **line, char *buf)
 
 int				get_next_line(int const fd, char **line)
 {
-	static char		*buf = "";
+	static char		*buf = NULL;
 	int				ret;
 	char			*str;
 	int				err;
 
 	ret = 1;
 	err = 0;
-	if (!line || fd < 0)
+	if (fd < 0)
 		return (-1);
-	if (!*buf)
+//	if (!line)
+//	{
+//		free(buf);
+//		buf = NULL;
+//		ft_strdel(&buf);
+//		return (-1);
+//	}
+	if (!buf)
 		buf = ft_strnew(0);
 	while (ret > 0)
 	{
@@ -70,5 +77,7 @@ int				get_next_line(int const fd, char **line)
 	}
 	if (*buf)
 		ret = line_without_linefeed(line, buf);
+	if (ret == 0)
+		ft_strdel(&buf);
 	return (ret);
 }
