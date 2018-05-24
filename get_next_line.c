@@ -6,7 +6,7 @@
 /*   By: jmurte <jmurte@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/10 16:31:52 by jmurte            #+#    #+#             */
-/*   Updated: 2018/05/24 15:56:13 by jmurte           ###   ########.fr       */
+/*   Updated: 2018/05/24 16:17:44 by jmurte           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ char			*increase_buf(int fd, char *oldbuf, int *ret_val, int *err)
 	char	*newbuf;
 
 	*ret_val = read(fd, tmp, BUFF_SIZE);
-	if (*ret_val == -1)
+	if (*ret_val < 0)
 	{
 		*err = 1;
 		*ret_val = 0;
@@ -26,6 +26,8 @@ char			*increase_buf(int fd, char *oldbuf, int *ret_val, int *err)
 	tmp[*ret_val] = '\0';
 	newbuf = ft_strjoin(oldbuf, tmp);
 	ft_strdel(&oldbuf);
+	if (*ret_val == 0 && *err == 1)
+		*ret_val = -1;
 	return (newbuf);
 }
 
@@ -55,13 +57,6 @@ int				get_next_line(int const fd, char **line)
 	err = 0;
 	if (fd < 0)
 		return (-1);
-//	if (!line)
-//	{
-//		free(buf);
-//		buf = NULL;
-//		ft_strdel(&buf);
-//		return (-1);
-//	}
 	if (!buf)
 		buf = ft_strnew(0);
 	while (ret > 0)
@@ -72,12 +67,10 @@ int				get_next_line(int const fd, char **line)
 			return (1);
 		}
 		buf = increase_buf(fd, buf, &ret, &err);
-		if (err == 1)
-			return (-1);
 	}
 	if (*buf)
 		ret = line_without_linefeed(line, buf);
-	if (ret == 0)
+	if (ret == 0 || ret == -1)
 		ft_strdel(&buf);
 	return (ret);
 }
